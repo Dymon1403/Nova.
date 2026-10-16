@@ -9,11 +9,10 @@ import re
 import io
 import wave
 
-# --- Настройки ---
-SERVER_URL = "http://192.168.0.228:5000/transcribe"  # <-- поменяй на IP сервера
+SERVER_URL = "http://192.168.0.228:5000/transcribe"  # поменяй на IP сервера.
 SAMPLE_RATE = 16000
 BLOCK_SIZE = int(SAMPLE_RATE * 0.5)
-BUFFER_DURATION = 4.0  # секунд аудио для распознавания
+BUFFER_DURATION = 4.0
 MPD_HOST = "localhost"
 MPD_PORT = 6600
 
@@ -26,14 +25,11 @@ def audio_callback(indata, frames, time_info, status):
     audio_queue.put(indata.copy())
 
 def send_to_server(audio_data):
-    """Отправляет аудио на сервер и получает текст."""
-    # Конвертируем numpy array в WAV
     buffer = io.BytesIO()
     with wave.open(buffer, "wb") as wf:
         wf.setnchannels(1)
         wf.setsampwidth(2)
         wf.setframerate(SAMPLE_RATE)
-        # Конвертируем float32 в int16
         audio_int16 = (audio_data * 32767).astype(np.int16)
         wf.writeframes(audio_int16.tobytes())
     buffer.seek(0)
@@ -47,19 +43,17 @@ def send_to_server(audio_data):
         if response.status_code == 200:
             return response.json().get("text", "")
         else:
-            print(f"Ошибка сервера: {response.status_code}")
+            print(f"Fuck my ass: {response.status_code}")
             return ""
     except Exception as e:
         print(f"Ошибка сети: {e}")
         return ""
 
 def handle_command(text):
-    """Парсит команду и управляет MPD."""
     trigger_words = ["вруби", "включи", "поставь", "играй"]
     if not any(word in text for word in trigger_words):
         return
 
-    # Убираем триггер
     track_name = text
     for word in trigger_words:
         track_name = track_name.replace(word, "").strip()
@@ -67,7 +61,7 @@ def handle_command(text):
     if not track_name:
         return
 
-    print(f"Ищу: '{track_name}'")
+    print(f"Search: '{track_name}'")
 
     try:
         client = mpd.MPDClient()
@@ -80,14 +74,14 @@ def handle_command(text):
         playlist = client.playlistinfo()
         if playlist:
             client.play()
-            print(f"Играю: {playlist[0].get('file', 'неизвестно')}")
+            print(f"Play: {playlist[0].get('file', 'not found in Music pull')}")
         else:
-            print(f"Трек '{track_name}' не найден")
+            print(f"Track '{track_name}' not found in Music pull")
 
         client.close()
         client.disconnect()
     except Exception as e:
-        print(f"Ошибка MPD: {e}")
+        print(f"eRror MPD: {e}")
 
 def process_audio():
     buffer = np.array([], dtype=np.float32)
@@ -118,8 +112,8 @@ if __name__ == "__main__":
                             channels=1,
                             callback=audio_callback,
                             blocksize=BLOCK_SIZE):
-            print("Слушаю...")
+            print("Learning...")
             while True:
                 time.sleep(0.1)
     except KeyboardInterrupt:
-        print("\nВыход...")
+        print("\eXiting...")
