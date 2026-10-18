@@ -6,9 +6,9 @@ import os
 app = Flask(__name__)
 
 MODEL_SIZE = "base"
-print(f"Загрузка модели Whisper '{MODEL_SIZE}'...")
+print(f"Load Whisper model '{MODEL_SIZE}'...")
 model = whisper.load_model(MODEL_SIZE)
-print("Модель загружена. Сервер готов.")
+print("Model load. Server Ready.")
 
 @app.route("/transcribe", methods=["POST"])
 def transcribe():
