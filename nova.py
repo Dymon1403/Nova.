@@ -98,7 +98,7 @@ def process_audio():
             text = send_to_server(audio_to_process)
 
             if text:
-                print(f"Распознано: '{text}'")
+                print(f"Recognized: '{text}'")
                 handle_command(text)
 
             buffer = np.array([], dtype=np.float32)
